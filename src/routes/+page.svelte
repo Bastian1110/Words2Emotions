@@ -1,8 +1,7 @@
 <script>
 // @ts-nocheck
-
     let recognition;
-    let paragraph;
+    let text;
     try {
         const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
         recognition = new SpeechRecognition();
@@ -12,26 +11,31 @@
 
     recognition.interimResults = true;
     recognition.lang = 'es';
+    let recognitionStarted = false;
     const activateRecognition = () => {
-        recognition.start();
-        console.log("Recognition started")
+        if (recognitionStarted) {
+            recognition.stop();
+            recognitionStarted = !recognitionStarted;
+            console.log("Recognition stoped")
+            return;
+        }
+        if (!recognitionStarted) {
+            recognition.start();
+            recognitionStarted = !recognitionStarted;
+            console.log("Recognition started")
+            return;
+        }
     }
 
     recognition.onresult = (event) => {
-        const res = event.results[0][0].transcript;
+        text = event.results[0][0].transcript;
         console.log(res)
     }
-
-    recognition.onspeechend = () => {
-        recognition.stop();
-         console.log("Recognition stoped")
-    }
-
 </script>
 
 <h1 class="font-bold text-6xl m-10 text-[#affaff]">Speech Test</h1>
 <div class="text-4xl m-10 text-[#d4f9fc]">
-    <p bind:this={paragraph}>l</p>
+    <p>{text}</p>
 </div>
 
 <div class="grid place-items-center">
