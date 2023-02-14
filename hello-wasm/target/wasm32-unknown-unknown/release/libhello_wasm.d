@@ -1,0 +1,1 @@
+/Users/sebmora/Documents/Codes/JS/Svelte/word2emotions/hello-wasm/target/wasm32-unknown-unknown/release/libhello_wasm.rlib: /Users/sebmora/Documents/Codes/JS/Svelte/word2emotions/hello-wasm/src/lib.rs /Users/sebmora/Documents/Codes/JS/Svelte/word2emotions/hello-wasm/src/utils.rs

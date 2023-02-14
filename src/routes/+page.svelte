@@ -1,5 +1,18 @@
 <script>
      // @ts-nocheck
+     /*
+     WASM to Svelte conection
+     import { onMount } from 'svelte';
+     import init, { greet } from 'hello-wasm';
+ 
+     onMount(async () => {
+         let wasm = await init();
+ 
+         greet();
+     });
+     */
+    
+
     let recognition;
     let text = "Sup?";
     try {
@@ -28,7 +41,7 @@
     }
 </script>
 
-<h1 class="font-bold text-6xl m-10 text-[#affaff]">Words to Emotions</h1>
+<h1 class="font-bold text-6xl m-10 text-[#affaff]">Words 2 Emotions</h1>
 <div class="text-4xl m-10 text-[#d4f9fc]">
     <p>{text}</p>
 </div>
