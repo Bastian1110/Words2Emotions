@@ -323,6 +323,18 @@ dependencies = [
 ]
 
 [[package]]
+name = "linfa-bayes"
+version = "0.6.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "a78a843df0c6098f7d018dee26bc1865e86c098e8564ea65ed64e2d596577b54"
+dependencies = [
+ "linfa",
+ "ndarray",
+ "ndarray-stats",
+ "thiserror",
+]
+
+[[package]]
 name = "linfa-linalg"
 version = "0.1.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -801,6 +813,7 @@ dependencies = [
  "dict",
  "encoding",
  "linfa",
+ "linfa-bayes",
  "linfa-logistic",
  "linfa-preprocessing",
  "ndarray",
