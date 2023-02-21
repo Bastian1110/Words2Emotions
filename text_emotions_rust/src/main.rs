@@ -5,6 +5,7 @@ use linfa_bayes::GaussianNb;
 //use linfa_logistic::LogisticRegression;
 use linfa_preprocessing::CountVectorizer;
 use ndarray::prelude::*;
+use std::prelude::*;
 
 //Dataframe for reading the emotion dataset
 struct DataFrame {
@@ -59,12 +60,12 @@ fn main() {
     let data = DataFrame::read_csv("./dataset/emotions_clean.csv");
 
     //Vectorizing the text from dataset
-    let vec_sentences: Vec<&str> = data.clean_text.iter().map(|x| &**x).collect();
+    let vec_sentences: Vec<&str> = data.text.iter().map(|x| &**x).collect();
     let arr_sentences = Array::from_vec(vec_sentences);
     println!(
         "Targets : {:?}  Docs : {:?}",
         data.emotion.len(),
-        data.clean_text.len()
+        data.text.len()
     );
     let vectorizer = CountVectorizer::params().fit(&arr_sentences).unwrap();
     println!(
@@ -94,13 +95,32 @@ fn main() {
     //Acurracy
     let cm = training_prediction.confusion_matrix(&train).unwrap();
     let accuracy = cm.f1_score();
-    println!("The fitted model has a training f1 score of {}", accuracy);
+    println!(
+        "The fitted model has a training Training score of {}",
+        accuracy
+    );
 
-    let test_string = array!["I'm so borred right now, I want to go home"];
-    let test_array = vectorizer.transform(&test_string).to_dense();
-    let test_array = test_array.mapv(|c| c as f32);
+    let valid_prediction = model.predict(&valid);
 
-    println!("Test : {}", test_string);
-    let test_prediction = model.predict(&test_array);
-    println!("{:?} Prediction of last entry", test_prediction.first());
+    let cm_valid = valid_prediction.confusion_matrix(&valid).unwrap();
+    let valid_accuracy = cm_valid.f1_score();
+    println!(
+        "The fitted model has a training Validation score of {}",
+        valid_accuracy
+    );
+
+    while true {
+        println!("Enter an input");
+        let mut input = String::new();
+        std::io::stdin()
+            .read_line(&mut input)
+            .expect("failed to read input");
+        let input_string = array![input.as_str()];
+        let input_array = vectorizer.transform(&input_string).to_dense();
+        let input_array = input_array.mapv(|c| c as f32);
+
+        println!("Test : {}", input_string);
+        let input_prediction = model.predict(&input_array);
+        println!("{:?} Prediction of last entry", input_prediction.first());
+    }
 }
