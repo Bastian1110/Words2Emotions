@@ -1,28 +1,23 @@
-use csv;
 use dict::{Dict, DictIface};
-use linfa::{metrics::ToConfusionMatrix, traits::Fit, traits::Predict, DatasetBase};
-use linfa_bayes::GaussianNb;
-//use linfa_logistic::LogisticRegression;
+use linfa::prelude::*;
+use linfa_logistic::MultiLogisticRegression;
 use linfa_preprocessing::CountVectorizer;
 use ndarray::prelude::*;
-use std::prelude::*;
+use std::error::Error;
+use std::io;
 
 //Dataframe for reading the emotion dataset
 struct DataFrame {
-    index: Vec<u128>,
-    emotion: Vec<usize>,
+    emotions: Vec<usize>,
     text: Vec<String>,
-    clean_text: Vec<String>,
     emotions_map: Dict<String>,
     n_emotions: usize,
 }
 impl DataFrame {
     fn new() -> DataFrame {
         DataFrame {
-            index: Vec::new(),
-            emotion: Vec::new(),
+            emotions: Vec::new(),
             text: Vec::new(),
-            clean_text: Vec::new(),
             emotions_map: Dict::<String>::new(),
             n_emotions: 0,
         }
@@ -42,85 +37,72 @@ impl DataFrame {
     }
 
     fn push(&mut self, row: &csv::StringRecord) {
-        self.index.push(row[0].parse().unwrap());
-        if !(self.emotions_map.contains_key(&row[1])) {
+        if !(self.emotions_map.contains_key(&row[0])) {
             self.emotions_map
-                .add(row[1].to_string(), self.n_emotions.to_string());
+                .add(row[0].to_string(), self.n_emotions.to_string());
             self.n_emotions = self.n_emotions + 1;
         }
-        let emotion_number = self.emotions_map.get(&row[1]).unwrap();
-        self.emotion.push(emotion_number.parse().unwrap());
-        self.text.push(row[2].to_string());
-        self.clean_text.push(row[3].to_string());
+        let emotion_number = self.emotions_map.get(&row[0]).unwrap();
+        self.emotions.push(emotion_number.parse().unwrap());
+        self.text.push(row[1].to_string());
     }
 }
 
-fn main() {
-    //Importing the dataset from csv
-    let data = DataFrame::read_csv("./dataset/emotions_clean.csv");
+fn main() -> Result<(), Box<dyn Error>> {
+    //Read the data into a datafram
+    let data_from_csv = DataFrame::read_csv("./dataset/gooddata.csv");
 
-    //Vectorizing the text from dataset
-    let vec_sentences: Vec<&str> = data.text.iter().map(|x| &**x).collect();
-    let arr_sentences = Array::from_vec(vec_sentences);
-    println!(
-        "Targets : {:?}  Docs : {:?}",
-        data.emotion.len(),
-        data.text.len()
-    );
-    let vectorizer = CountVectorizer::params().fit(&arr_sentences).unwrap();
-    println!(
-        "We obtain a vocabulary with {} entries",
-        vectorizer.nentries()
-    );
+    let text_vec: Vec<&str> = data_from_csv.text.iter().map(|x| &**x).collect();
+    let text_arr = Array::from_vec(text_vec);
+
+    let vectorizer = CountVectorizer::params().fit(&text_arr).unwrap();
+    println!("Vectorizer with : {} entries", vectorizer.nentries());
+    let records = vectorizer.transform(&text_arr).to_dense();
+    let records = records.mapv(|c| c as f64);
+
+    let emotion_arr = Array::from_vec(data_from_csv.emotions);
+
+    //We create a dataset with the vectorized text and the targets
+    let emotion_dataset = Dataset::new(records, emotion_arr);
+
+    let (train, valid) = emotion_dataset.split_with_ratio(0.9);
+
+    //Multi fitted logistic regression
+    let model = MultiLogisticRegression::default()
+        .max_iterations(100)
+        .fit(&train)
+        .unwrap();
+
+    let pred = model.predict(&valid);
+
+    let cm = pred.confusion_matrix(&valid).unwrap();
+
+    println!("accuracy {}, MCC {}", cm.accuracy(), cm.mcc());
 
     println!("Emotion Table");
-    for o in data.emotions_map {
+    for o in data_from_csv.emotions_map {
         println!("{} - {}", o.key, o.val);
     }
 
-    //Making the training datset with records and targets
-    let records = vectorizer.transform(&arr_sentences).to_dense();
-    let records = records.mapv(|c| c as f32);
-
-    let targets = Array1::from_shape_vec(data.emotion.len(), data.emotion).unwrap();
-
-    let (train, valid) = DatasetBase::new(records, targets)
-        .split_with_ratio(0.9)
-        .into();
-
-    //Making the model
-    let model = GaussianNb::params().fit(&train).unwrap();
-    let training_prediction = model.predict(&train);
-
-    //Acurracy
-    let cm = training_prediction.confusion_matrix(&train).unwrap();
-    let accuracy = cm.f1_score();
-    println!(
-        "The fitted model has a training Training score of {}",
-        accuracy
-    );
-
-    let valid_prediction = model.predict(&valid);
-
-    let cm_valid = valid_prediction.confusion_matrix(&valid).unwrap();
-    let valid_accuracy = cm_valid.f1_score();
-    println!(
-        "The fitted model has a training Validation score of {}",
-        valid_accuracy
-    );
-
-    while true {
-        println!("Enter an input");
-        let mut input = String::new();
-        std::io::stdin()
-            .read_line(&mut input)
-            .expect("failed to read input");
-        let input_string = array![input.as_str()];
-        let input_array = vectorizer.transform(&input_string).to_dense();
-        let input_array = input_array.mapv(|c| c as f32);
-
-        println!("Test : {}", input_string);
-        let input_prediction = model.predict(&input_array);
-        println!("{:?} Prediction of last entry", input_prediction.first());
+    let mut keep_alive = true;
+    while keep_alive {
+        println!("New test?");
+        let mut keep = String::new();
+        io::stdin().read_line(&mut keep)?;
+        if keep == "y".to_string() {
+            keep_alive = false;
+        }
+        if keep_alive {
+            println!("Enter test input : ");
+            let mut input = String::new();
+            io::stdin().read_line(&mut input)?;
+            let test_string = array![input.as_str()];
+            let test_vector = vectorizer.transform(&test_string).to_dense();
+            let test_vector = test_vector.mapv(|c| c as f64);
+            let test_prediction = model.predict(&test_vector);
+            println!("Prediction : {:?}", test_prediction);
+        }
     }
+
+    Ok(())
 }
