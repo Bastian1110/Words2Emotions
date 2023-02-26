@@ -5,6 +5,8 @@
 echo "Preparing security copy ... 🐧"
 
 rm -r target
+rm pipeline.cbor
+rm Cargo.lock
 
 rm -r -f ../../JS/Svelte/word2emotions/text_emotions_rust/*
 

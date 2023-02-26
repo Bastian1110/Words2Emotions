@@ -3,14 +3,14 @@ name = "text_emotions_rust"
 version = "0.1.0"
 edition = "2021"
 
-# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
-
 [dependencies]
+ciborium = "0.2.0"
 csv = "1.2.0"
 dict = "0.1.5"
 linfa = "0.6.1"
 linfa-logistic = "0.6.1"
-linfa-preprocessing = "0.6.1"
+linfa-preprocessing = {git = "https://github.com/rust-ml/linfa.git", features = ["serde"], default-features = false }
 ndarray = "0.15.6"
+serde = "1.0.152"
 
 #getrandom = { version = "0.2", features = ["js"] } used for compiling to WASM
