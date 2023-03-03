@@ -33,8 +33,9 @@
 	},
 	"type": "module",
 	"dependencies": {
+		"@fontsource/roboto-mono": "^4.5.10",
+		"text_emotions_rust": "file:src/text_emotions_rust",
 		"vite-plugin-top-level-await": "^1.2.4",
-		"vite-plugin-wasm": "^3.2.1",
-		"hello-wasm": "file:src/hello-wasm"
+		"vite-plugin-wasm": "^3.2.1"
 	}
 }

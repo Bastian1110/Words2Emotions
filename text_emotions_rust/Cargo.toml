@@ -12,5 +12,20 @@ linfa-logistic = "0.6.1"
 linfa-preprocessing = {git = "https://github.com/rust-ml/linfa.git", features = ["serde"], default-features = false }
 ndarray = "0.15.6"
 serde = "1.0.152"
+getrandom = { version = "0.2", features = ["js"] }
+wasm-bindgen = "0.2.83"
+console_error_panic_hook = { version = "0.1.7", optional = true }
+wee_alloc = { version = "0.4.5", optional = true }
 
-#getrandom = { version = "0.2", features = ["js"] } used for compiling to WASM
+[dev-dependencies]
+wasm-bindgen-test = "0.3.33"
+
+[profile.release]
+# Tell `rustc` to optimize for small code size.
+opt-level = "s"
+
+[lib]
+crate-type = ["cdylib", "rlib"]
+
+[features]
+default = ["console_error_panic_hook"]

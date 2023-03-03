@@ -9,29 +9,39 @@ use std::error::Error;
 use std::fs;
 use std::path::Path;
 
+//Author : Sebastian Mora
+//Main model for reconizing emptions with a very primitive NLP algorithm
+//using a logistic regression and a count vextorizer
+
+//Serializable "pipeline" for texporting the complete model
 #[derive(Serialize, Deserialize, Debug)]
 pub struct EmotionDetection {
     vectorizer: CountVectorizer,
     regression: MultiFittedLogisticRegression<f64, usize>,
+    labels: Vec<String>,
 }
 impl EmotionDetection {
     pub fn new(
         new_vectorizer: CountVectorizer,
         new_regression: MultiFittedLogisticRegression<f64, usize>,
+        new_labels: Vec<String>,
     ) -> EmotionDetection {
         EmotionDetection {
             vectorizer: new_vectorizer,
             regression: new_regression,
+            labels: new_labels,
         }
     }
 
-    pub fn predict_string(&self, input: String) {
+    pub fn predict_string(&self, input: String) -> String {
         let input_str = array![input.as_str()];
         let input_vector = self.vectorizer.transform(&input_str).to_dense();
         let input_vector = input_vector.mapv(|c| c as f64);
 
         let input_predition = self.regression.predict(&input_vector);
-        println!("Prediction : {:?}", input_predition)
+        let emotion_number = input_predition.get(0).unwrap().to_owned();
+        let emotion = self.labels.get(emotion_number).unwrap().to_owned();
+        return emotion;
     }
 }
 
@@ -41,6 +51,7 @@ struct DataFrame {
     text: Vec<String>,
     emotions_map: Dict<String>,
     n_emotions: usize,
+    labels: Vec<String>,
 }
 impl DataFrame {
     fn new() -> DataFrame {
@@ -49,6 +60,7 @@ impl DataFrame {
             text: Vec::new(),
             emotions_map: Dict::<String>::new(),
             n_emotions: 0,
+            labels: Vec::new(),
         }
     }
     fn read_csv(filepath: &str) -> DataFrame {
@@ -69,6 +81,7 @@ impl DataFrame {
         if !(self.emotions_map.contains_key(&row[0])) {
             self.emotions_map
                 .add(row[0].to_string(), self.n_emotions.to_string());
+            self.labels.push(row[0].to_string());
             self.n_emotions = self.n_emotions + 1;
         }
         let emotion_number = self.emotions_map.get(&row[0]).unwrap();
@@ -114,8 +127,10 @@ pub fn main() -> Result<(), Box<dyn Error>> {
     for o in data_from_csv.emotions_map {
         println!("{} - {}", o.key, o.val);
     }
+    println!("test");
+    println!("{:?}", data_from_csv.labels);
 
-    let pipeline = EmotionDetection::new(vectorizer, model);
+    let pipeline = EmotionDetection::new(vectorizer, model, data_from_csv.labels);
 
     //Exporting the model
     let pipeline_value = cbor!(pipeline).unwrap();

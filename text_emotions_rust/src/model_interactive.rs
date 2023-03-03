@@ -1,13 +1,11 @@
-use ciborium::cbor;
 use dict::{Dict, DictIface};
 use linfa::prelude::*;
 use linfa_logistic::MultiLogisticRegression;
 use linfa_preprocessing::CountVectorizer;
 use ndarray::prelude::*;
 use std::error::Error;
-use std::fs;
 use std::io;
-use std::path::Path;
+//Script to test the mdel with std::io
 
 //Dataframe for reading the emotion dataset
 struct DataFrame {
