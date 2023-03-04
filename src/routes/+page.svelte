@@ -110,7 +110,7 @@
 
 <style lang="postcss">
 	:global(html) {
-		background: #0c061ff7;
+		background: #120f1ef7;
 		font-family: 'Roboto-Mono', monospace;
 	}
 </style>
