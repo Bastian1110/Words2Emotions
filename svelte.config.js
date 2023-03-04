@@ -14,15 +14,9 @@ const config = {
 			pages: 'build',
 			assets: 'build',
 			fallback: null,
-			precompress: false
-		}),
-		prerender: {
-			default: true
-		},
-		trailingSlash: 'always',
-		paths: {
-			base: '/Words2Emotions'
-		}
+			precompress: false,
+			strict: true
+		})
 	}
 };
 
