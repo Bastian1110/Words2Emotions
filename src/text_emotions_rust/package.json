@@ -1,0 +1,12 @@
+{
+	"name": "text_emotions_rust",
+	"version": "0.1.0",
+	"files": [
+		"text_emotions_rust_bg.wasm",
+		"text_emotions_rust.js",
+		"text_emotions_rust.d.ts"
+	],
+	"module": "text_emotions_rust.js",
+	"types": "text_emotions_rust.d.ts",
+	"sideEffects": false
+}
