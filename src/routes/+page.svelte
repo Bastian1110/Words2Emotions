@@ -39,7 +39,7 @@
 		recognition.stop();
 		console.log('Recognition stoped');
 		predictEmotion(text);
-		myEffect(emotions);
+		myEffect(emotion);
 		return;
 	};
 
