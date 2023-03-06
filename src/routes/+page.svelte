@@ -72,6 +72,10 @@
 	};
 </script>
 
+<svelte:head>
+  <title>Words 2 Emotions</title>
+</svelte:head>
+
 <h1 class="font-bold text-4xl md:text-6xl mx-10 mt-12 mb-10 text-[rgb(27,18,57)]">
 	Words to Emotions
 </h1>

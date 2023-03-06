@@ -22,17 +22,34 @@
 </button>
 
 <div
-	class="fixed inset-0 z-10 overflow-y-auto"
+	class="transition-all duration-500 fixed inset-0 z-10 overflow-y-auto bg-blue-900 bg-opacity-60"
 	style="display: {isOpen ? 'block' : 'none'};"
 	transition:slide={{ duration: 1000 }}
 >
 	<div class="flex items-center justify-center min-h-screen">
-		<div class="bg-white rounded-lg shadow-lg px-6 py-4">
-			<h2 class="text-lg font-bold mb-4">Hello There!</h2>
-			<p class="mb-4">Instructions</p>
-			<button class="px-4 py-2 bg-blue-500 text-white" on:click={() => (isOpen = false)}
-				>Close Modal</button
-			>
+		<div class="bg-white rounded-lg shadow-lg px-6 py-4 w-[70%]">
+			<section class="w-[100%]">
+				<h2 class="font-bold text-4xl inline-block">Welcome!</h2>
+				<button
+					class="px-4 py-1 bg-blue-500 text-white inline-block float-right"
+					on:click={() => (isOpen = false)}>X</button
+				>
+			</section>
+			<section class="w-[45%] inline-block">
+				<p class="text-lg">
+					This is webpage of the project <a
+						class="text-blue-500"
+						target="_blank"
+						rel="noopener noreferrer"
+						href="https://github.com/Bastian1110/Words2Emotions">Words2Emotions</a
+					>, which aims to make an AI model run natively on your computer, without the need of downloading anything!<br>
+					The model is trained to try to classify what you are feeling based on the things you say to the web page. It's important to say that
+					it only has an acurracy of <i>53.2%</i>, so it fails once for every two trys.
+				</p>
+			</section>
+			<section class="w-[45%] inline-block">
+				<img src="images/first_cat.png" alt="Thinking cat" class="w-[80%] float-right"/>
+			</section>
 		</div>
 	</div>
 </div>
