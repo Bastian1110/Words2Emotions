@@ -2,6 +2,7 @@
 	import { slide } from 'svelte/transition';
 
 	let isOpen = true;
+	let inInstructions = false;
 </script>
 
 <button class="px-4 py-2 bg-blue-400 text-white rounded-xl" on:click={() => (isOpen = !isOpen)}>
@@ -28,6 +29,7 @@
 >
 	<div class="flex items-center justify-center min-h-screen">
 		<div class="bg-white rounded-lg shadow-lg px-6 py-4 w-[70%]">
+			{#if  !inInstructions}
 			<section class="w-[100%]">
 				<h2 class="font-bold text-4xl inline-block">Welcome!</h2>
 				<button
@@ -50,6 +52,32 @@
 			<section class="w-[45%] inline-block">
 				<img src="images/first_cat.png" alt="Thinking cat" class="w-[80%] float-right"/>
 			</section>
+			<section class="w-[100%]">
+				<button class="text-blue-500 float-right underline" on:click={() => {inInstructions = true}}>how to use it?</button>
+			</section>
+			{/if}
+			{#if inInstructions}
+			<section class="w-[100%]">
+				<h2 class="font-bold text-4xl inline-block">How to use it?</h2>
+				<button
+					class="px-4 py-1 bg-blue-500 text-white inline-block float-right"
+					on:click={() => (isOpen = false)}>X</button
+				>
+			</section>
+			<section class="w-[45%] inline-block">
+				<p class="text-lg">
+					You only need to push the microphone button, while you press it, the computer will 
+					listen to your voice and try to convert it to text, when you finish talking you can 
+					stop pressing the button, the model will make the prediction!
+				</p>
+			</section>
+			<section class="w-[45%] inline-block">
+				<img src="images/first_cat.png" alt="Thinking cat" class="w-[80%] float-right"/>
+			</section>
+			<section class="w-[100%]">
+				<button class="text-blue-500 float-left underline" on:click={() => {inInstructions = false}}>welcome</button>
+			</section>
+			{/if}
 		</div>
 	</div>
 </div>
